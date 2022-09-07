@@ -9,6 +9,7 @@ call plug#begin()
 "   - Avoid using standard Vim directory names like 'plugin'
 
 " Make sure you use single quotes
+Plug 'vim-scripts/a.vim'
 
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
@@ -63,6 +64,7 @@ lua require("lsp")
 nmap <leader>v :edit $MYVIMRC<Enter>
 nmap <leader>l :edit $MYVIMRC/../lua/lsp.lua<Enter>
 nmap <leader>w :w <Enter>
+nmap <leader>a :A <Enter>
 
 nnoremap <leader>f <cmd>Telescope find_files<cr>
 
