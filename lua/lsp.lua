@@ -147,6 +147,12 @@ require'lspconfig'.clangd.setup{
 	root_dir = on_cwd
 }
 
+require'lspconfig'.tsserver.setup{
+	capabilities = capabilities,
+	on_attach = on_attach,
+	root_dir = on_cwd
+}
+
 local dap = require('dap')
 
 dap.adapters.coreclr = {

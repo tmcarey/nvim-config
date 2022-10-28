@@ -7,7 +7,8 @@ call plug#begin()
 " You can specify a custom plugin directory by passing it as the argument
 "   - e.g. `call plug#begin('~/.vim/plugged')`
 "   - Avoid using standard Vim directory names like 'plugin'
-
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'folke/trouble.nvim'
 " Make sure you use single quotes
 Plug 'vim-scripts/a.vim'
 
@@ -51,6 +52,14 @@ let mapleader = ","
 
 autocmd!
 " autocmd BufEnter * call system("nircmd win activate ititle \"cmd.exe\"")
+
+lua << EOF
+  require("trouble").setup {
+    -- your configuration comes here
+    -- or leave it empty to use the default settings
+    -- refer to the configuration section below
+  }
+EOF
 
 colorscheme nightfox
 let g:airline_themegruvbox='simple'
