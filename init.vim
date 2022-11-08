@@ -1,4 +1,5 @@
 set relativenumber
+set number
 set completeopt-=preview
 let $TERM="cygwin"
 filetype plugin indent on
@@ -17,6 +18,11 @@ Plug 'tpope/vim-commentary'
 
 Plug 'EdenEast/nightfox.nvim'
 
+Plug 'tpope/vim-surround'
+
+Plug 'jose-elias-alvarez/null-ls.nvim'
+Plug 'MunifTanjim/prettier.nvim'
+
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
@@ -33,7 +39,6 @@ Plug 'jose-elias-alvarez/typescript.nvim'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
-Plug 'hrsh7th/cmp-cmdline'
 Plug 'hrsh7th/nvim-cmp'
 
 " For vsnip users.
@@ -59,6 +64,44 @@ lua << EOF
     -- or leave it empty to use the default settings
     -- refer to the configuration section below
   }
+
+	local null_ls = require("null-ls")
+
+	null_ls.setup({
+		on_attach = function(client, bufnr)
+			if client.server_capabilities.documentFormattingProvider then
+				vim.cmd("nnoremap <silent><buffer> <Leader>f :lua vim.lsp.buf.formatting()<CR>")
+
+				-- format on save
+				vim.cmd("autocmd BufWritePost <buffer> lua vim.lsp.buf.formatting()")
+			end
+
+			if client.server_capabilities.documentRangeFormattingProvider then
+				vim.cmd("xnoremap <silent><buffer> <Leader>f :lua vim.lsp.buf.range_formatting({})<CR>")
+			end
+		end,
+	})
+
+	local prettier = require("prettier")
+
+	prettier.setup({
+		bin = 'prettier', -- or `'prettierd'` (v0.22+)
+		filetypes = {
+			"css",
+			"graphql",
+			"html",
+			"javascript",
+			"javascriptreact",
+			"json",
+			"less",
+			"markdown",
+			"scss",
+			"typescript",
+			"typescriptreact",
+			"yaml",
+		},
+	})
+
 EOF
 
 colorscheme nightfox
@@ -71,9 +114,9 @@ set completeopt=menu,menuone,noselect
 lua require("lsp")
 
 nmap <leader>v :edit $MYVIMRC<Enter>
-nmap <leader>l :edit $MYVIMRC/../lua/lsp.lua<Enter>
 nmap <leader>w :w <Enter>
 nmap <leader>a :A <Enter>
+nmap <c-;> <Esc>
 
 nnoremap <leader>f <cmd>Telescope find_files<cr>
 
