@@ -1,4 +1,5 @@
 set relativenumber
+set number
 set completeopt-=preview
 let $TERM="cygwin"
 filetype plugin indent on
@@ -19,6 +20,9 @@ Plug 'EdenEast/nightfox.nvim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
+Plug 'nvim-tree/nvim-web-devicons' " optional, for file icons
+Plug 'nvim-tree/nvim-tree.lua'
+
 Plug 'williamboman/mason.nvim'
 Plug 'williamboman/mason-lspconfig.nvim'
 Plug 'neovim/nvim-lspconfig'
@@ -28,6 +32,10 @@ Plug 'nvim-telescope/telescope.nvim'
 
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'jose-elias-alvarez/typescript.nvim'
+
+" Vim Script
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'folke/trouble.nvim'
 
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
@@ -65,6 +73,7 @@ nmap <leader>v :edit $MYVIMRC<Enter>
 nmap <leader>l :edit $MYVIMRC/../lua/lsp.lua<Enter>
 nmap <leader>w :w <Enter>
 nmap <leader>a :A <Enter>
+nmap <leader>t :NvimTreeToggle <Enter>
 
 nnoremap <leader>f <cmd>Telescope find_files<cr>
 
@@ -72,3 +81,40 @@ if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
 
+lua << EOF
+  require("trouble").setup {
+    -- your configuration comes here
+    -- or leave it empty to use the default settings
+    -- refer to the configuration section below
+  }
+  -- examples for your init.lua
+
+	-- disable netrw at the very start of your init.lua (strongly advised)
+	vim.g.loaded_netrw = 1
+	vim.g.loaded_netrwPlugin = 1
+
+	-- set termguicolors to enable highlight groups
+	vim.opt.termguicolors = true
+
+	-- empty setup using defaults
+	require("nvim-tree").setup()
+
+	-- OR setup with some options
+	require("nvim-tree").setup({
+	  sort_by = "case_sensitive",
+	  view = {
+		adaptive_size = true,
+		mappings = {
+		  list = {
+			{ key = "u", action = "dir_up" },
+		  },
+		},
+	  },
+	  renderer = {
+		group_empty = true,
+	  },
+	  filters = {
+		dotfiles = true,
+	  },
+	})
+EOF
