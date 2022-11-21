@@ -23,8 +23,13 @@ Plug 'tpope/vim-surround'
 Plug 'jose-elias-alvarez/null-ls.nvim'
 Plug 'MunifTanjim/prettier.nvim'
 
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+Plug 'nvim-lualine/lualine.nvim'
+Plug 'kyazdani42/nvim-web-devicons'
+
+Plug 'onsails/lspkind.nvim'
+Plug 'L3MON4D3/LuaSnip'
+
+Plug 'windwp/nvim-ts-autotag'
 
 Plug 'nvim-tree/nvim-web-devicons' " optional, for file icons
 Plug 'nvim-tree/nvim-tree.lua'
@@ -48,10 +53,6 @@ Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/nvim-cmp'
 
-" For vsnip users.
-Plug 'hrsh7th/cmp-vsnip'
-Plug 'hrsh7th/vim-vsnip'
-
 Plug 'mfussenegger/nvim-dap'
 " Initialize plugin system
 " - Automatically executes `filetype plugin indent on` and `syntax enable`.
@@ -72,42 +73,6 @@ lua << EOF
     -- refer to the configuration section below
   }
 
-	local null_ls = require("null-ls")
-
-	null_ls.setup({
-		on_attach = function(client, bufnr)
-			if client.server_capabilities.documentFormattingProvider then
-				vim.cmd("nnoremap <silent><buffer> <Leader>f :lua vim.lsp.buf.formatting()<CR>")
-
-				-- format on save
-				vim.cmd("autocmd BufWritePost <buffer> lua vim.lsp.buf.formatting()")
-			end
-
-			if client.server_capabilities.documentRangeFormattingProvider then
-				vim.cmd("xnoremap <silent><buffer> <Leader>f :lua vim.lsp.buf.range_formatting({})<CR>")
-			end
-		end,
-	})
-
-	local prettier = require("prettier")
-
-	prettier.setup({
-		bin = 'prettier', -- or `'prettierd'` (v0.22+)
-		filetypes = {
-			"css",
-			"graphql",
-			"html",
-			"javascript",
-			"javascriptreact",
-			"json",
-			"less",
-			"markdown",
-			"scss",
-			"typescript",
-			"typescriptreact",
-			"yaml",
-		},
-	})
 
 EOF
 
@@ -146,25 +111,26 @@ lua << EOF
 	-- set termguicolors to enable highlight groups
 	vim.opt.termguicolors = true
 
-	-- empty setup using defaults
-	require("nvim-tree").setup()
-
 	-- OR setup with some options
 	require("nvim-tree").setup({
 	  sort_by = "case_sensitive",
 	  view = {
-		adaptive_size = true,
+			adaptive_size = true,
 		mappings = {
-		  list = {
-			{ key = "u", action = "dir_up" },
-		  },
 		},
 	  },
 	  renderer = {
-		group_empty = true,
+			group_empty = true,
 	  },
 	  filters = {
-		dotfiles = true,
+			dotfiles = false,
 	  },
+		actions = {
+			open_file = {
+				quit_on_open = true,
+			}
+		}
 	})
+
+	require('lualine').setup()
 EOF

@@ -69,6 +69,9 @@ require'nvim-treesitter.configs'.setup {
 }
 -- Setup nvim-cmp.
 local cmp = require'cmp'
+local lspkind = require'lspkind'
+require("luasnip.loaders.from_vscode").lazy_load()
+require('nvim-ts-autotag').setup()
 
 cmp.setup({
 	snippet = {
@@ -100,7 +103,20 @@ cmp.setup({
 		-- { name = 'snippy' }, -- For snippy users.
 	}, {
 		{ name = 'buffer' },
-	})
+	}),
+	formatting = {
+		format = lspkind.cmp_format({
+			mode = 'symbol', -- show only symbol annotations
+			maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+			ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
+
+			-- The function below will be called before any actual modifications from lspkind
+			-- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
+			before = function (entry, vim_item)
+				return vim_item
+			end
+		})
+	}
 })
 
 -- Set configuration for specific filetype.
@@ -134,23 +150,83 @@ cmp.setup.cmdline(':', {
 local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
 
-require'lspconfig'.csharp_ls.setup{
+-- require'lspconfig'.csharp_ls.setup{
+-- 	capabilities = capabilities,
+-- 	on_attach = on_attach,
+-- 	root_dir = on_cwd
+-- }
+
+-- require'lspconfig'.clangd.setup{
+-- 	capabilities = capabilities,
+-- 	on_attach = on_attach,
+-- 	root_dir = on_cwd
+-- }
+
+require'lspconfig'.tailwindcss.setup{
 	capabilities = capabilities,
 	on_attach = on_attach,
 	root_dir = on_cwd
 }
 
-require'lspconfig'.clangd.setup{
-	capabilities = capabilities,
-	on_attach = on_attach,
-	root_dir = on_cwd
-}
-
+local tscapabliities = capabilities
 require'lspconfig'.tsserver.setup{
-	capabilities = capabilities,
-	on_attach = on_attach,
-	root_dir = on_cwd
 }
+
+local null_ls = require("null-ls")
+
+null_ls.setup({
+  on_attach = function(client, bufnr)
+    if client.server_capabilities.documentFormattingProvider then
+      vim.cmd("nnoremap <silent><buffer> <Leader>F :lua vim.lsp.buf.format {async = true }<CR>")
+
+      -- format on save
+      vim.cmd("autocmd BufWritePost <buffer> lua vim.lsp.buf.format { async = true }")
+    end
+
+    if client.server_capabilities.documentRangeFormattingProvider then
+      vim.cmd("xnoremap <silent><buffer> <Leader>F :lua vim.lsp.buf.range_formatting({})<CR>")
+    end
+  end,
+  sources = {
+    null_ls.builtins.diagnostics.eslint_d.with({
+      diagnostics_format = '[eslint] #{m}\n(#{c})'
+    }),
+    null_ls.builtins.diagnostics.fish,
+    null_ls.builtins.code_actions.eslint_d,
+    null_ls.builtins.formatting.eslint_d
+  }
+})
+
+local prettier = require("prettier")
+
+prettier.setup({
+  bin = 'prettierd', -- or `'prettierd'` (v0.22+)
+  filetypes = {
+    "css",
+    "graphql",
+    "html",
+    "javascript",
+    "javascriptreact",
+    "json",
+    "less",
+    "markdown",
+    "scss",
+    "typescript",
+    "typescriptreact",
+    "yaml",
+  },
+})
+
+local opts = { noremap=true, silent=true }
+
+local function quickfix()
+    vim.lsp.buf.code_action({
+        filter = function(a) return a.isPreferred end,
+        apply = true
+    })
+end
+
+vim.keymap.set('n', '<leader>qf', quickfix, opts)
 
 local dap = require('dap')
 
