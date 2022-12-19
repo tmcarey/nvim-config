@@ -26,8 +26,8 @@ local on_attach = function(client, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, bufopts)
   vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
+  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
   -- vim.keymap.set('n', '<space>f', vim.lsp.buf.format, bufopts)
 end
@@ -36,6 +36,45 @@ local lsp_flags = {
   -- This is the default in Nvim 0.7+
   debounce_text_changes = 150
 }
+
+
+require('copilot').setup({
+  panel = {
+    enabled = true,
+    auto_refresh = false,
+    keymap = {
+      jump_prev = "[[",
+      jump_next = "]]",
+      accept = "<leader>a",
+      refresh = "gr",
+      open = "<M-CR>"
+    },
+  },
+  suggestion = {
+    enabled = true,
+    auto_trigger = true,
+    debounce = 75,
+    keymap = {
+     accept = "<leader>a",
+     next = "<M-]>",
+     prev = "<M-[>",
+     dismiss = "<C-]>",
+    },
+  },
+  filetypes = {
+    yaml = false,
+    markdown = false,
+    help = false,
+    gitcommit = false,
+    gitrebase = false,
+    hgcommit = false,
+    svn = false,
+    cvs = false,
+    ["."] = false,
+  },
+  copilot_node_command = 'node', -- Node.js version must be > 16.x
+  server_opts_overrides = {},
+})
 
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all"
@@ -67,9 +106,18 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
 }
--- Setup nvim-cmp.
+-- -- Setup nvim-cmp.
 local cmp = require'cmp'
 local lspkind = require'lspkind'
+
+lspkind.init({
+  symbol_map = {
+    Copilot = "",
+  },
+})
+
+vim.api.nvim_set_hl(0, "CmpItemKindCopilot", {fg ="#6CC644"})
+
 require("luasnip.loaders.from_vscode").lazy_load()
 require('nvim-ts-autotag').setup()
 
@@ -92,9 +140,10 @@ cmp.setup({
 		['<C-f>'] = cmp.mapping.scroll_docs(4),
 		['<C-Space>'] = cmp.mapping.complete(),
 		['<C-e>'] = cmp.mapping.abort(),
-		['<Tab>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+		['<Tab>'] = cmp.mapping.confirm({ select = true })
 	}),
 	sources = cmp.config.sources({
+		{ name = 'copilot' },
 		{ name = 'nvim_lsp' },
 		{ name = 'vsnip' }, -- For vsnip users.
 		{ name = 'path' }
@@ -107,7 +156,7 @@ cmp.setup({
 	formatting = {
 		format = lspkind.cmp_format({
 			mode = 'symbol', -- show only symbol annotations
-			maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+			maxwidth = 100, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
 			ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
 
 			-- The function below will be called before any actual modifications from lspkind
@@ -118,6 +167,24 @@ cmp.setup({
 		})
 	}
 })
+
+require'nvim-treesitter.configs'.setup {
+  context_commentstring = {
+    enable = true
+  }
+}
+
+-- require("copilot_cmp").setup({
+--   method = "getCompletionsCycling",
+-- })
+
+-- cmp.event:on("menu_opened", function()
+--   vim.b.copilot_suggestion_hidden = true
+-- end)
+
+-- cmp.event:on("menu_closed", function()
+--   vim.b.copilot_suggestion_hidden = false
+-- end)
 
 -- Set configuration for specific filetype.
 cmp.setup.filetype('gitcommit', {

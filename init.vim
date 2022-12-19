@@ -13,12 +13,15 @@ Plug 'folke/trouble.nvim'
 " Make sure you use single quotes
 Plug 'vim-scripts/a.vim'
 
+Plug 'zbirenbaum/copilot.lua'
+" Plug 'zbirenbaum/copilot-cmp'
+
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
 
-Plug 'EdenEast/nightfox.nvim'
-
+Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-rhubarb'
 
 Plug 'jose-elias-alvarez/null-ls.nvim'
 Plug 'MunifTanjim/prettier.nvim'
@@ -53,6 +56,8 @@ Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/nvim-cmp'
 
+Plug 'JoosepAlviste/nvim-ts-context-commentstring'
+
 Plug 'mfussenegger/nvim-dap'
 " Initialize plugin system
 " - Automatically executes `filetype plugin indent on` and `syntax enable`.
@@ -63,21 +68,17 @@ call plug#end()
 
 let mapleader = ","
 
-autocmd!
 " autocmd BufEnter * call system("nircmd win activate ititle \"cmd.exe\"")
-
+"
 lua << EOF
   require("trouble").setup {
     -- your configuration comes here
     -- or leave it empty to use the default settings
     -- refer to the configuration section below
   }
-
-
 EOF
 
-colorscheme nightfox
-let g:airline_themegruvbox='simple'
+colorscheme tokyonight
 
 lua require("mason").setup()
 lua require("mason-lspconfig").setup()
@@ -90,11 +91,16 @@ nmap <leader>w :w <Enter>
 nmap <leader>a :A <Enter>
 nmap <leader>t :NvimTreeToggle <Enter>
 
+inoremap kj <Esc>
 nnoremap <leader>f <cmd>Telescope find_files<cr>
 
 if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
+
+command! -nargs=1 Browse silent execute '!open' shellescape(<q-args>,1)
+
+autocmd FileType qf nmap <buffer> <cr> <cr>:cclose<cr>
 
 lua << EOF
   require("trouble").setup {
@@ -132,5 +138,13 @@ lua << EOF
 		}
 	})
 
-	require('lualine').setup()
+	require('lualine').setup {
+    options = {
+      theme = 'tokyonight'
+    }
+  }
+
+
 EOF
+
+let g:lightline = {'colorscheme': 'tokyonight'}
