@@ -64,6 +64,12 @@ return require('packer').startup(function(use)
       }
     end
   },
+
+  use 'terrortylor/nvim-comment',
+
+  use 'github/copilot.vim',
+
+  use 'tpope/vim-rhubarb'
 }
 
 end)
