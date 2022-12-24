@@ -64,7 +64,9 @@ return require('packer').startup(function(use)
 
   use 'tpope/vim-rhubarb',
 
-  use 'bluz71/vim-moonfly-colors'
+  use 'bluz71/vim-moonfly-colors',
+
+  use 'tpope/vim-surround'
 }
 
 end)
