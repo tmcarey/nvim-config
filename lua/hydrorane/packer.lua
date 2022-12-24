@@ -69,7 +69,10 @@ return require('packer').startup(function(use)
 
   use 'github/copilot.vim',
 
-  use 'tpope/vim-rhubarb'
+  use 'tpope/vim-rhubarb',
+
+  use 'tpope/vim-surround'
+
 }
 
 end)
